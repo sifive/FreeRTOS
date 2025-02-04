@@ -11,18 +11,14 @@ MAKE = make
 
 # Generate GCC_VERSION in number format
 GCC_VERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | awk -F. '{ printf("%d%02d%02d"), $$1, $$2, $$3 }')
-GCC_VERSION_NEED_ZICSR = "110100"
+
+MARCH = rv64imafdcv_zicsr_zicntr_zihpm_ziccif_ziccrse_ziccamoa_zicclsm_za64rs_zihintpause_zic64b_zicbom_zicbop_zicboz_zfhmin_zkt_zvfhmin_zvbb_zvkt_zihintntl_zawrs
+MABI = lp64d
 
 CFLAGS += $(INCLUDE_DIRS) -fmessage-length=0 \
-          -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections \
+          -march=$(MARCH) -mabi=$(MABI) -mcmodel=medany -ffunction-sections -fdata-sections \
           -Wno-unused-parameter -nostartfiles -g3 -Os
 
-ifeq ($(shell test $(GCC_VERSION) -ge $(GCC_VERSION_NEED_ZICSR) && echo true),true)
-    CFLAGS += -march=rv32imac_zicsr
-else
-    CFLAGS += -march=rv32imac
-endif
-          
 ifeq ($(PICOLIBC),1)
 CFLAGS += --specs=picolibc.specs -DPICOLIBC_INTEGER_PRINTF_SCANF 
 else
@@ -30,7 +26,7 @@ CFLAGS += --specs=nano.specs -fno-builtin-printf
 endif
 
 LDFLAGS += -nostartfiles -Xlinker --gc-sections -Wl,-Map,$(OUTPUT_DIR)/RTOSDemo.map \
-           -T./fake_rom.ld -march=rv32imac -mabi=ilp32 -mcmodel=medlow -Xlinker \
+           -T./fake_rom.ld -march=$(MARCH) -mabi=$(MABI) -mcmodel=medany -Xlinker \
            --defsym=__stack_size=350 -Wl,--start-group -Wl,--end-group
 
 ifeq ($(PICOLIBC),1)
@@ -55,7 +51,7 @@ KERNEL_DIR = $(FREERTOS_ROOT)/Source
 KERNEL_PORT_DIR += $(KERNEL_DIR)/portable/GCC/RISC-V
 INCLUDE_DIRS += -I$(KERNEL_DIR)/include \
 				-I$(KERNEL_PORT_DIR) \
-				-I$(KERNEL_PORT_DIR)/chip_specific_extensions/RV32I_CLINT_no_extensions
+				-I$(KERNEL_PORT_DIR)/chip_specific_extensions/RV32IF_CLINT
 VPATH += $(KERNEL_DIR) $(KERNEL_PORT_DIR) $(KERNEL_DIR)/portable/MemMang
 SOURCE_FILES += $(KERNEL_DIR)/tasks.c
 SOURCE_FILES += $(KERNEL_DIR)/list.c
@@ -105,7 +101,7 @@ SOURCE_FILES += (COMMON_DEMO_FILES)/TimerDemo.c
 # Application entry point.  main_blinky is self contained.  main_full builds
 # the above common demo (and test) files too.
 #
-DEMO_PROJECT = $(DEMO_ROOT)/RISC-V_RV32_QEMU_VIRT_GCC
+DEMO_PROJECT = $(DEMO_ROOT)/RISC-V-RVA23-Qemu-virt_GCC
 VPATH += $(DEMO_PROJECT)
 INCLUDE_DIRS += -I$(DEMO_PROJECT)
 SOURCE_FILES += (DEMO_PROJECT)/main.c
