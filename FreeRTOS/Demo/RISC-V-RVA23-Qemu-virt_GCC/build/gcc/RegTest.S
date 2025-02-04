@@ -37,7 +37,7 @@
  * main_full.c.
  */
 
-.align( 4 )
+.align( 8 )
 vRegTest1Implementation:
 
     /* Fill the core registers with known values. */
@@ -131,10 +131,10 @@ reg1_loop:
 #endif
 
     /* Everything passed, increment the loop counter. */
-    lw x15, ulRegTest1LoopCounterConst
-    lw x14, 0(x15)
+    ld x15, ulRegTest1LoopCounterConst
+    ld x14, 0(x15)
     addi x14, x14, 1
-    sw x14, 0(x15)
+    sd x14, 0(x15)
 
     /* Restore clobbered register reading for next loop. */
     li x14, 0xe
@@ -149,12 +149,12 @@ reg1_error_loop:
     /* Busy loop which holds the task. */
     jal reg1_error_loop
 
-.align( 4 )
-ulRegTest1LoopCounterConst: .word ulRegTest1LoopCounter
+.align( 8 )
+ulRegTest1LoopCounterConst: .dword ulRegTest1LoopCounter
 
 /*-----------------------------------------------------------*/
 
-.align( 4 )
+.align( 8 )
 vRegTest2Implementation:
 
     /* Fill the core registers with known values. */
@@ -248,10 +248,10 @@ Reg2_loop:
 #endif
 
     /* Everything passed, increment the loop counter. */
-    lw x5, ulRegTest2LoopCounterConst
-    lw x6, 0(x5)
+    ld x5, ulRegTest2LoopCounterConst
+    ld x6, 0(x5)
     addi x6, x6, 1
-    sw x6, 0(x5)
+    sd x6, 0(x5)
 
     /* Restore clobbered register reading for next loop. */
     li x6, 0x61
@@ -263,5 +263,5 @@ reg2_error_loop:
     /* Busy loop which holds the task. */
     jal reg2_error_loop
 
-.align( 4 )
-ulRegTest2LoopCounterConst: .word ulRegTest2LoopCounter
+.align( 8 )
+ulRegTest2LoopCounterConst: .dword ulRegTest2LoopCounter
