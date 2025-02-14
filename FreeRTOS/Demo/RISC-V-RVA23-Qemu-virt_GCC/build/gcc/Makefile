@@ -12,12 +12,17 @@ MAKE = make
 # Generate GCC_VERSION in number format
 GCC_VERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | awk -F. '{ printf("%d%02d%02d"), $$1, $$2, $$3 }')
 
-MARCH = rv64imafdcv_zicsr_zicntr_zihpm_ziccif_ziccrse_ziccamoa_zicclsm_za64rs_zihintpause_zic64b_zicbom_zicbop_zicboz_zfhmin_zkt_zvfhmin_zvbb_zvkt_zihintntl_zawrs
+# The following ISA string should be used, however since autovectorization may not be disabled it
+# may cause issues if the Vector registers are not stored when we do task switching. So for the time
+# being, we don't include the vector extensions.
+#MARCH = rv64imafdcv_zicsr_zicntr_zihpm_ziccif_ziccrse_ziccamoa_zicclsm_za64rs_zihintpause_zic64b_zicbom_zicbop_zicboz_zfhmin_zkt_zvfhmin_zvbb_zvkt_zihintntl_zawrs
+MARCH = rv64imafdc_zicsr_zicntr_zihpm_ziccif_ziccrse_ziccamoa_zicclsm_za64rs_zihintpause_zic64b_zicbom_zicbop_zicboz_zfhmin_zkt_zihintntl_zawrs
 MABI = lp64d
 
 CFLAGS += $(INCLUDE_DIRS) -fmessage-length=0 \
           -march=$(MARCH) -mabi=$(MABI) -mcmodel=medany -ffunction-sections -fdata-sections \
-          -Wno-unused-parameter -nostartfiles -g3 -Os
+          -Wno-unused-parameter -nostartfiles -g3 -Os -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize -fvect-cost-model=unlimited
+
 
 ifeq ($(PICOLIBC),1)
 CFLAGS += --specs=picolibc.specs -DPICOLIBC_INTEGER_PRINTF_SCANF 
