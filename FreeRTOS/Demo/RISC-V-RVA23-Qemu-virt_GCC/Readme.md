@@ -2,11 +2,16 @@
 
 ## Requirements
 
-1. GNU RISC-V toolchains (tested on pre-built Sifive GNU Embedded Toolchain — v2020.12.8)
-  - https://www.sifive.com/software
-1. qemu-riscv32-system  (tested on pre-built Sifive QEMU — v2020.08.1)
-  - https://www.sifive.com/software
-1. Linux OS (tested on Ubuntu 20.04.3 LTS)
+1. GNU RISC-V toolchains (tested on 
+  * Pre-built Sifive GNU Embedded Toolchain — v3.0.4 - https://www.sifive.com/software
+  * Self built from https://github.com/riscv-collab/riscv-gnu-toolchain/tree/a33dac0251d17a7b74d99bd8fd401bfce87d2aed (tag: 2025.01.20)
+    using the configure options
+    `./configure --prefix=/opt/riscv --with-cmodel=medany '--with-multilib-generator=rv64ima-lp64--fdv*c'`
+
+1. qemu-riscv64-system. Tested on
+  * pre-built Sifive QEMU — v3.0.4)- https://www.sifive.com/software
+  * qemu-system-riscv64 v 8.2.2
+1. Linux OS (tested on Ubuntu 24.04 LTS)
 
 
 ## How to build
@@ -41,10 +46,9 @@ If the build was successful, the RTOSDemo.elf executable will be located in the 
 ## How to run
 
 ```
-$ qemu-system-riscv32 -nographic -machine virt -net none \
-  -chardev stdio,id=con,mux=on -serial chardev:con \
-  -mon chardev=con,mode=readline -bios none \
-  -smp 4 -kernel ./build/gcc/output/RTOSDemo.elf
+$ qemu-system-riscv64 -nographic -machine virt -net none -chardev stdio,id=con,mux=on \
+    -serial chardev:con -mon chardev=con,mode=readline -bios none -smp 4 \
+    -s --kernel build/gcc/output/RTOSDemo.elf
 ```
 
 
